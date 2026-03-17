@@ -44,9 +44,9 @@ export function scheduleEmail(customer) {
   // Main fix that solved the issue of current time emails not being sent
   if (scheduledDate <= new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1)) {
     if (scheduledDate < now) {
-      console.log(`Sending immediately (past due) for ${customer.emailAddress}: ${customer.date}`);
+      console.log(`Sending for ${customer.emailAddress}: ${customer.date}`);
     } else {
-      console.log(`Sending immediately (current minute) for ${customer.emailAddress}: ${customer.date}`);
+      console.log(`Sending for ${customer.emailAddress}: ${customer.date}`);
     }
     sender(customer)
       .then(async () => {
