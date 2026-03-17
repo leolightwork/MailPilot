@@ -1,10 +1,10 @@
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import MainCard from './MainCard.jsx';
-import EmailList from './EmailList.jsx';
-import Login from '../pages/Login.jsx';
-import Signup from '../pages/Signup.jsx';
-import '../styles/global.css';
-import '../styles/header.css';
+import MainCard from '../features/emails/MainCard.jsx';
+import EmailList from '../features/emails/EmailList.jsx';
+import Login from '../features/auth/Login.jsx';
+import Signup from '../features/auth/Signup.jsx';
+import './global.css';
+import './header.css';
 
 const Sidebar = () => {
   const location = useLocation();

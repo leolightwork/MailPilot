@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import '../styles/auth.css';
+import './auth.css';
 
 const Login = () => {
   const {

@@ -1,6 +1,6 @@
 import cron from 'node-cron';
-import Customer from '../schemas/customer.js';
-import { sender } from './nodeMailerInit.js';
+import Customer from './email.schema.js';
+import { sender } from './email.mailer.js';
 
 // Tracks running jobs: customerId (string) → cron Task
 const activeJobs = new Map();
@@ -38,9 +38,27 @@ export function scheduleEmail(customer) {
     activeJobs.delete(id);
   }
 
-  // Skip if the scheduled date is already in the past
-  if (parseDate(customer.date) < new Date()) {
-    console.log(`Skipping past date for ${customer.emailAddress}: ${customer.date}`);
+  const scheduledDate = parseDate(customer.date);
+  const now = new Date();
+
+  // Main fix that solved the issue of current time emails not being sent
+  if (scheduledDate <= new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1)) {
+    if (scheduledDate < now) {
+      console.log(`Sending immediately (past due) for ${customer.emailAddress}: ${customer.date}`);
+    } else {
+      console.log(`Sending immediately (current minute) for ${customer.emailAddress}: ${customer.date}`);
+    }
+    sender(customer)
+      .then(async () => {
+        if (customer.repeat > 0) {
+          const nextDate = addDays(customer.date, customer.repeat);
+          await Customer.findByIdAndUpdate(customer._id, { date: nextDate });
+          scheduleEmail({ ...customer.toObject?.() ?? customer, date: nextDate });
+        } else {
+          await Customer.findByIdAndDelete(customer._id);
+        }
+      })
+      .catch((err) => console.error(`Failed to send to ${customer.emailAddress}:`, err.message));
     return;
   }
 
@@ -64,6 +82,7 @@ export function scheduleEmail(customer) {
         // One-time: clean up
         task.stop();
         activeJobs.delete(id);
+        await Customer.findByIdAndDelete(customer._id);
       }
     } catch (err) {
       console.error(`Failed to send to ${customer.emailAddress}:`, err.message);

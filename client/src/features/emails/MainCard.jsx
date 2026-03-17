@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import '../styles/main-card.css';
+import './main-card.css';
 import { useEffect } from 'react';
 
 const MainCard = () => {
@@ -11,16 +11,9 @@ const MainCard = () => {
   } = useForm();
 
   const onSubmit = async (formData) => {
-    const formattedDate = new Date(formData.date)
-      .toLocaleString('en-GB', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      })
-      .replace(',', '');
+    const [datePart, timePart] = formData.date.split('T');
+    const [year, month, day] = datePart.split('-');
+    const formattedDate = `${day}/${month}/${year} ${timePart}`;
 
     const payload = {
       emailAddress: formData.email,

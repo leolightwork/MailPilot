@@ -1,4 +1,4 @@
-import '../styles/email-list.css';
+import './email-list.css';
 import { useEffect, useState } from 'react';
 
 const EmailList = () => {
